@@ -13,6 +13,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "concurrency/transaction.h"
 #include "storage/index/index_iterator.h"
@@ -23,6 +24,7 @@ namespace bustub {
 
 #define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
 
+enum class Operation { FIND = 0, INSERT, DELETE };
 /**
  * Main class providing the API for the Interactive B+ Tree.
  *
@@ -79,6 +81,10 @@ class BPlusTree {
   // expose for test purpose
   Page *FindLeafPage(const KeyType &key, bool leftMost = false);
 
+  std::pair<Page *, bool> FindLeafPageByOperation(const KeyType &key, Operation operation = Operation::FIND,
+                                                  Transaction *transaction = nullptr, bool leftMost = false,
+                                                  bool rightMost = false);
+
  private:
   void StartNewTree(const KeyType &key, const ValueType &value);
 
@@ -109,6 +115,11 @@ class BPlusTree {
 
   void ToString(BPlusTreePage *page, BufferPoolManager *bpm) const;
 
+  template <typename N>
+  bool IsSafe(N *node, Operation op);
+
+  void UnlockUnpinPages(Transaction *transaction);
+
   // member variable
   std::string index_name_;
   page_id_t root_page_id_;
@@ -116,6 +127,7 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+  std::mutex root_latch_;
 };
 
 }  // namespace bustub

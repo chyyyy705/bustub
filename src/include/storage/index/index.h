@@ -104,7 +104,7 @@ class Index {
  public:
   explicit Index(IndexMetadata *metadata) : metadata_(metadata) {}
 
-  virtual ~Index() { delete metadata_; }
+  virtual ~Index() {}
 
   // Return the metadata object associated with the index
   IndexMetadata *GetMetadata() const { return metadata_; }
